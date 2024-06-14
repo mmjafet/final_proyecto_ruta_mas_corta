@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmos_chidos.com</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            overflow-y: scroll; /* Permite el scroll vertical */
+        }
+
+        h1 {
+            text-align: center;
+            color: #004d40;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 1.1em;
+            color: #004d40;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #00796b;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #004d40;
+        }
+
+        /* Estilos para el mapa */
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .info {
+            margin-top: 20px;
+        }
+
+        .info p {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .info p span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Estilos para los planetas */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(0, 150, 136, 0.6);
+            animation: orbit 10s linear infinite;
+            z-index: 0;
+        }
+
+        .planet:nth-child(1) {
+            width: 20px;
+            height: 20px;
+            top: 10%;
+            left: 10%;
+            animation-duration: 16s;
+        }
+
+        .planet:nth-child(2) {
+            width: 30px;
+            height: 30px;
+            top: 50%;
+            left: 50%;
+            animation-duration: 24s;
+        }
+
+        .planet:nth-child(3) {
+            width: 25px;
+            height: 25px;
+            top: 80%;
+            left: 80%;
+            animation-duration: 18s;
+        }
+
+        @keyframes orbit {
+            from {
+                transform: rotate(0deg) translateX(100px) rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg) translateX(100px) rotate(-360deg);
+            }
+        }
+
+        /* Personalización de la barra de desplazamiento (opcional) */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f4f4f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #00796b;
+            border-radius: 10px;
+            border: 2px solid #f4f4f9;
+        }
+
+        .footer {
+            text-align: center;
+            color: #777;
+            margin-top: 20px;
+            z-index: 1;
+        }
+    </style>
+    <script>
+        let map, directionsService, directionsRenderer;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 5,
+                center: { lat: 23.6345, lng: -102.5528 }
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+        }
+
+        function trazarRuta(coordenadasRuta, nodosIntermedios, distancia) {
+            const waypoints = coordenadasRuta.slice(1, -1).map(coord => ({
+                location: { lat: coord[0], lng: coord[1] },
+                stopover: true
+            }));
+
+            const origen = coordenadasRuta[0];
+            const destino = coordenadasRuta[coordenadasRuta.length - 1];
+
+            const request = {
+                origin: { lat: origen[0], lng: origen[1] },
+                destination: { lat: destino[0], lng: destino[1] },
+                waypoints: waypoints,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+
+            directionsService.route(request, (result, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+
+                    let totalDistance = 0;
+                    result.routes[0].legs.forEach(leg => {
+                        totalDistance += leg.distance.value;
+                    });
+                    const distanceInKm = (totalDistance / 1000).toFixed(2);
+
+                    mostrarInfoRuta(nodosIntermedios, distanceInKm);
+                } else {
+                    alert('Error al obtener la ruta: ' + status);
+                }
+            });
+        }
+
+        function mostrarInfoRuta(nodosIntermedios, distancia) {
+            // Busca el contenedor de información existente y lo elimina si está presente
+            const existingInfoDiv = document.querySelector('.info');
+            if (existingInfoDiv) {
+                existingInfoDiv.remove();
+            }
+        
+            // Crea un nuevo contenedor de información
+            const infoDiv = document.createElement('div');
+            infoDiv.classList.add('info');
+        
+            // Prepara el contenido de la información
+            const infoText = `<p>Ciudades por las que pasa: <span>${nodosIntermedios}</span></p>
+                              <p>Distancia total: <span>${distancia}</span> km</p>`;
+        
+            // Inserta el nuevo contenido de la información
+            infoDiv.innerHTML = infoText;
+            document.getElementById('map').insertAdjacentElement('afterend', infoDiv);
+        }
+        
+
+        function obtenerRuta() {
+            const ciudad_inicio = document.getElementById('ciudad_inicio').value;
+            const ciudad_final = document.getElementById('ciudad_final').value;
+
+            fetch('/get_routes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ start: ciudad_inicio, end: ciudad_final })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    trazarRuta(data.coordenadas_ruta, data.nodos_intermedios_encontrados, data.distancia);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un error al obtener la ruta.');
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Planetas Tierra animados -->
+    <div class="planet"></div>
+    <div class="planet"></div>
+    <div class="planet"></div>
+    <div class="planet"></div>
+    <div class="planet"></div>
+    <div class="planet"></div>
+
+    <div class="container">
+        <h1 id="section1">Calcular la ruta mas corta</h1>
+        <div class="selector">
+            <div>
+                <label for="ciudad_inicio">Ciudad de inicio:</label>
+                <select id="ciudad_inicio">
+                    {% for ciudad in ciudades %}
+                        <option value="{{ ciudad }}">{{ ciudad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="ciudad_final">Ciudad de fin:</label>
+                <select id="ciudad_final">
+                    {% for ciudad in ciudades %}
+                        <option value="{{ ciudad }}">{{ ciudad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button onclick="obtenerRuta()">Obtener ruta</button>
+        </div>
+        <div id="map" id="section3"></div>
+        <div class="info" id="section4"></div>
+   
+    </div>
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2024 Algoritmos chidos.com</p>
+    </div>
+
+    <!-- Carga la API de Google Maps con tu clave API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=I&callback=initMap" async defer></script>
+</body>
+</html>

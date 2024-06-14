@@ -1,0 +1,139 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #15202b; /* Fondo más oscuro */
+    overflow: hidden;
+    position: relative;
+    height: 100vh;
+}
+
+.dynamic-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    overflow: hidden;
+}
+
+.operation {
+    font-size: 2em; /* Tamaño de fuente más grande */
+    color: #ffcc80; /* Color amarillo para resaltar */
+    animation: move 10s infinite linear;
+}
+
+@keyframes move {
+    from {
+        transform: translateY(0) rotate(0);
+    }
+    to {
+        transform: translateY(-100vh) rotate(360deg);
+    }
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #263238; /* Color de fondo más oscuro */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-top: 50px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden; /* Para ocultar el desbordamiento de la animación de fuego */
+    color: #fff;
+}
+
+/* Animación de fuego */
+.fire-animation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('fire.gif'); /* Imagen de fuego */
+    background-size: cover;
+    animation: fire 2s infinite alternate;
+}
+
+@keyframes fire {
+    from {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    to {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffcc80; /* Color amarillo */
+}
+
+form {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #ffcc80; /* Color amarillo */
+}
+
+select {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ffcc80; /* Color amarillo para el borde */
+    border-radius: 5px;
+    background-color: #37474f; /* Color de fondo más oscuro */
+    color: #fff; /* Color de texto blanco */
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #ffcc80; /* Color amarillo */
+    color: #263238; /* Color de texto más oscuro */
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #ffa726; /* Cambio de color al pasar el ratón */
+}
+
+#rutaResultado {
+    margin-top: 20px;
+    text-align: center;
+    color: #fff; /* Color de texto blanco */
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+
+a {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #ffcc80; /* Color amarillo */
+    text-decoration: none;
+    font-size: 1.1em;
+}
+
+a:hover {
+    color: #ffa726; /* Cambio de color al pasar el ratón */
+}
